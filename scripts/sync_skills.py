@@ -105,31 +105,35 @@ def save_sources(sources_data):
         json.dump(sources_data, f, ensure_ascii=False, indent=2)
     print(f"✅ 已保存 SKILL_SOURCES.json，共 {sources_data['total_count']} 个技能源")
 
-def generate_readme(sources_data):
-    """生成 README.md 文件"""
-    content = f"""# Skill Sources - 技能仓库聚合
+def update_readme(sources_data):
+    """在现有 README.md 底部追加技能仓库列表"""
+  
+    # 标记开始和结束
+    MARKER_START = "<!-- AUTO-SYNC-SKILLS-START -->"
+    MARKER_END = "<!-- AUTO-SYNC-SKILLS-END -->"
+  
+    # 生成技能列表内容
+    skills_content = f"""{MARKER_START}
 
-自动从多个上游源同步的技能仓库列表。
+## 📦 社区技能仓库聚合
 
-## 📊 统计信息
+> 此部分由自动化脚本每日从上游源同步更新
 
-- **最后更新**: {sources_data['last_updated']}
-- **技能源总数**: {sources_data['total_count']}
+**最后更新**: {sources_data['last_updated']} | **技能源总数**: {sources_data['total_count']}
 
-## 🔗 上游源
+### 数据来源
 
 - [OpenAI Skills](https://github.com/openai/skills)
 - [VoltAgent Awesome Agent Skills](https://github.com/VoltAgent/awesome-agent-skills)
 
-## 📦 技能仓库列表
+### 技能仓库列表
 
 """
   
+    # 按来源分组
     for source_key, source_info in UPSTREAM_SOURCES.items():
         source_name = source_info['name']
-        content += f"### {source_name}\n\n"
-        content += "| 仓库 | 来源 |\n"
-        content += "|------|------|\n"
+        skills_content += f"#### {source_name}\n\n"
       
         count = 0
         for repo_id, repo_data in sources_data['sources'].items():
@@ -143,28 +147,35 @@ def generate_readme(sources_data):
                     repo = '/'.join(parts[1:])
               
                 repo_url = f"https://github.com/{owner}/{repo}"
-                content += f"| [{repo}]({repo_url}) | {source_name} |\n"
+                skills_content += f"- [{repo}]({repo_url})\n"
                 count += 1
       
         if count == 0:
-            content += "| - | 暂无数据 |\n"
-        content += "\n"
+            skills_content += "- 暂无数据\n"
+      
+        skills_content += "\n"
   
-    content += """## 🔄 自动同步
-
-本仓库每天自动从上游源同步最新的技能仓库信息。
-
-- **定时触发**: 每天 02\:00 UTC
-- **手动触发**: 通过 GitHub Actions 页面
-
----
-
-*此文件由自动化脚本生成*
-"""
+    skills_content += f"{MARKER_END}"
+  
+    # 读取现有 README
+    existing_content = ""
+    if os.path.exists('README.md'):
+        with open('README.md', 'r', encoding='utf-8') as f:
+            existing_content = f.read()
+  
+    # 检查是否已存在标记
+    if MARKER_START in existing_content and MARKER_END in existing_content:
+        # 替换现有部分
+        import re
+        pattern = f"{MARKER_START}.*?{MARKER_END}"
+        new_content = re.sub(pattern, skills_content, existing_content, flags=re.DOTALL)
+    else:
+        # 追加到文件末尾
+        new_content = existing_content.rstrip() + "\n\n" + skills_content
   
     with open('README.md', 'w', encoding='utf-8') as f:
-        f.write(content)
-    print("✅ 已更新 README.md")
+        f.write(new_content)
+    print("✅ 已在 README.md 底部追加技能列表")
 
 def main():
     print("🚀 开始同步技能仓库...")
