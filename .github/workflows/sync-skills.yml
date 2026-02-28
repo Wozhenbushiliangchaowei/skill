@@ -25,17 +25,17 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-    
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-    
+
       - name: Run sync script
         run: python scripts/sync_skills.py
         env:
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-    
+
       - name: Check for changes
         id: check_changes
         run: |
@@ -44,7 +44,7 @@ jobs:
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
-    
+
       - name: Commit and push changes
         if: steps.check_changes.outputs.has_changes == 'true' && github.event.inputs.dry_run != 'true'
         run: |
@@ -53,7 +53,7 @@ jobs:
           git add SKILL_SOURCES.json README.md
           git commit -m "🔄 Auto-sync: Update skill sources from upstream [$(date +%Y-%m-%d)]"
           git push
-    
+
       - name: Summary
         run: |
           echo "## 📊 Sync Summary" >> $GITHUB_STEP_SUMMARY
