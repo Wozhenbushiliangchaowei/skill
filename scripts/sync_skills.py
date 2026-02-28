@@ -223,7 +223,7 @@ def main():
     
     # 保存文件
     save_sources(sources_data)
-    generate_readme(sources_data)
+    update_readme(sources_data)
     
     print(f"\n✨ 同步完成！共发现 {len(all_repos)} 个技能仓库")
 
