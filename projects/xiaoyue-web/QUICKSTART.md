@@ -1,71 +1,125 @@
-# 🚀 小易伴侣快速启动指南
+# 🚀 小易 + OpenClaw 快速启动指南
 
-## 方法 1：使用启动脚本（推荐）
+## 5 分钟快速开始
 
-直接双击 `start.bat` 文件即可！
-
-脚本会自动：
-- ✅ 检查 .env 配置
-- ✅ 验证 API Key
-- ✅ 启动服务器
-
-## 方法 2：手动启动
+### 1. 安装 OpenClaw
 
 ```bash
-# 进入项目目录
-cd D:\tool\skill\projects\xiaoyue-web
+# 克隆仓库
+git clone https://github.com/anbeime/openclaw.git
+cd openclaw
 
-# 启动服务器
-C:\Users\ASUS\.stepfun\runtimes\node\install_1770628825604_th45cs96cig\node-v22.18.0-win-x64\node.exe server.js
+# 安装并构建
+npm install
+npm run build
+
+# 链接到全局（推荐）
+npm link
 ```
 
-## 📝 首次使用配置
+### 2. 配置 OpenClaw
 
-1. **配置 API Key**（只需一次）
-   ```bash
-   copy .env.example .env
-   notepad .env
-   ```
-   
-2. **获取 API Key**
-   - 访问：https://open.bigmodel.cn/
-   - 注册并登录
-   - 创建 API Key
-   - 复制并粘贴到 .env 文件
+```bash
+# 运行配置向导
+openclaw configure
 
-3. **启动服务器**
-   - 双击 `start.bat`
-   - 或运行上面的手动启动命令
+# 或手动编辑配置文件
+notepad ~/.openclaw/openclaw.json
+```
 
-4. **打开浏览器**
-   - 访问：http://localhost:3000
-   - 开始和小易对话！
+配置示例：
+```json
+{
+  "gateway": {
+    "port": 18789,
+    "auth": {
+      "token": "your-token-here"
+    }
+  },
+  "models": {
+    "providers": {
+      "zhipu": {
+        "apiKey": "your-zhipu-key"
+      }
+    }
+  }
+}
+```
 
-## 💬 使用示例
+### 3. 启动 OpenClaw 网关
 
-试试这些对话：
-- "你好小易！"
-- "发张你在咖啡馆的照片"
-- "你在做什么？"
-- "今天心情怎么样？"
+```bash
+openclaw gateway
+```
 
-## ❓ 常见问题
+访问 http://localhost:18789/ 确认运行正常。
 
-### Q: 提示"需要配置 API Key"
-A: 编辑 .env 文件，填入真实的 API Key
+### 4. 配置小易
 
-### Q: 端口被占用
-A: 修改 .env 中的 PORT=3000 为其他端口
+```bash
+cd projects/xiaoyue-web
 
-### Q: 无法生成图片
-A: 检查 API Key 余额，新用户有免费额度
+# 复制环境变量文件
+cp .env.example .env
 
-## 🔗 相关链接
+# 编辑配置
+notepad .env
+```
 
-- 智谱 AI 平台：https://open.bigmodel.cn/
-- GitHub 仓库：https://github.com/anbeime/skill
-- 问题反馈：https://github.com/anbeime/skill/issues
+填写：
+- `ZHIPU_API_KEY`：你的智谱 API Key
+- `OPENCLAW_TOKEN`：从 OpenClaw 配置获取
 
----
+### 5. 启动小易
 
-**祝你和小易相处愉快！** 🎉
+```bash
+# 使用完整版服务器（推荐）
+node server-with-openclaw.js
+
+# 或使用基础版
+node server.js
+```
+
+### 6. 开始使用！
+
+打开浏览器访问：http://localhost:3000/voice.html
+
+## 💬 试试这些指令
+
+- "你好小易" - 打招呼
+- "帮我整理桌面文件" - 执行电脑任务
+- "帮我打开浏览器搜索 OpenClaw" - 打开浏览器
+- "发张照片" - 看任嘉伦照片
+- "有点累了" - 聊天安慰
+
+## 🔧 故障排查
+
+### OpenClaw 未运行
+
+```bash
+# 检查状态
+openclaw gateway status
+
+# 重新启动
+openclaw gateway
+```
+
+### API Key 错误
+
+- 确认 `.env` 文件配置正确
+- 确认智谱 API Key 有效
+- 确认 OpenClaw Token 正确
+
+### 端口冲突
+
+```bash
+# 检查端口占用
+netstat -ano | findstr 3000
+netstat -ano | findstr 18789
+```
+
+## 📚 更多信息
+
+- [完整集成指南](../../OPENCLAW_INTEGRATION_GUIDE.md)
+- [OpenClaw 官方文档](https://github.com/anbeime/openclaw)
+- [智谱 AI 文档](https://open.bigmodel.cn/)
